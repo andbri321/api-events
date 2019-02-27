@@ -1,6 +1,6 @@
 class Api::V1::EventsController < Api::V1::ApiController
- before_action :set_event, only: [:show, :update, :destroy]
- before_action :require_authorization!, only: [:show, :update, :destroy]
+  before_action :set_event, only: [:show, :search]
+  before_action :require_authorization!, only: [:show, :search]
 
  # GET /api/v1/events
  def index
@@ -9,29 +9,33 @@ class Api::V1::EventsController < Api::V1::ApiController
  end
 
  # GET /api/v1/events/1
- def show
-   render json: @event
+ def search
+   @events = current_user.events.where(issue: params[:issue])
+   render json: @events
  end
 
  # POST /api/v1/events
  def create
-   @event = Event.new(event_params.merge(user: current_user))
-   if @event.save
-     render json: @event, status: :created
-   else
-     render json: @event.errors, status: :unprocessable_entity
-   end
+     @event = Event.new(action: params[:event][:action],issue: params[:issue][:number],title: params[:issue][:title],body: params[:issue][:body],user: current_user)
+     if @event.save
+       render json: @event, status: :created
+     else
+       render json: @event.errors, status: :unprocessable_entity
+     end
  end
 
  private
 
    def set_event
-     @event = Event.find(params[:id])
+    @event = current_user.events.where(issue: params[:issue]).first
+    if @event.blank?
+      render json: {}
+    end
    end
 
-   def event_params
-     params.require(:event).permit(:action)
-   end
+   # def event_params
+   #   params.require(:event).permit(:action)
+   # end
 
    def require_authorization!
      unless current_user == @event.user

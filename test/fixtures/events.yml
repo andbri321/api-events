@@ -2,8 +2,14 @@
 
 one:
   action: MyString
+  issue: 1
+  title: MyString
+  body: MyString
   user: one
 
 two:
   action: MyString
+  issue: 1
+  title: MyString
+  body: MyString
   user: two

@@ -4,7 +4,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :events, only: [:show, :create, :index]
+      resources :events, only: [:index]
+      get '/issues/:issue/events', to: 'events#search'
     end
   end
 
